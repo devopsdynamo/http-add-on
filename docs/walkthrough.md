@@ -89,4 +89,38 @@ kubectl port-forward svc/keda-http-add-on-interceptor-proxy -n ${NAMESPACE} 8080
 curl -H "Host: myhost.com" localhost:8080/path1
 ```
 
+### Integrating HTTP Add-On Scaler with other KEDA scalers
+
+For scenerios where you want to integrate HTTP Add-On scaler with other keda scalers, you can set the SkipScaledObjectCreation annotation to true on your HTTPScaledObject.  The reconciler will then skip the KEDA core ScaledObject creation amd delete scaledObject if it already exists.  This will then allow you to create your own ScaledObject and add http scaler as one of your triggers.  
+
+It is reccomended that you first deploy your HTTPScaledObject with no annotation set in order to obtain the latest trigger spec to use on your own managed ScaledObject.    
+
+Step 1, first deploy your HTTPSCaledObject with annotation set to false
+
+```console
+annotations:
+  skipScaledObjectCreation: false
+```
+
+Step 2, take a copy of the current generated external-push trigger spec on the generated ScaledObject.  Please find example below, however this spec is likely to change on future releases.
+
+```console
+  triggers:
+  - type: external-push
+    metadata:
+      hosts: example-service
+      pathPrefixes: ""
+      scalerAddress: keda-http-add-on-external-scaler.keda:9090  
+```
+
+Step 3, update the skipScaledObjectCreation annotation to true and re-deploy.
+
+```console
+annotations:
+  skipScaledObjectCreation: true
+```
+
+Step 4, add the external-push trigger taken from step 2 to your own ScaledObject and apply this.
+
+
 [Go back to landing page](./)
