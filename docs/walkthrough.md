@@ -91,6 +91,7 @@ curl -H "Host: myhost.com" localhost:8080/path1
 
 ### Integrating HTTP Add-On Scaler with other KEDA scalers
 
+
 For scenerios where you want to integrate HTTP Add-On scaler with other keda scalers, you can set the SkipScaledObjectCreation annotation to true on your HTTPScaledObject.  The reconciler will then skip the KEDA core ScaledObject creation which will allow you to create your own ScaledObject and add http scaler as one of your triggers.  Please note that you should ensure the ScaledObject is created with a different name to the HTTPScaledObject to ensure your ScaledObject is not removed by the reconciler.
 
 It is reccomended that you first deploy your HTTPScaledObject with no annotation set in order to obtain the latest trigger spec to use on your own managed ScaledObject.    
@@ -103,6 +104,17 @@ annotations:
 ```
 
 Step 2, take a copy of the current generated external-push trigger spec on the generated ScaledObject.  Please find example below, however this spec is likely to change on future releases.
+
+
+For scenerios where you want to integrate HTTP Add-On scaler with other keda scalers, you can set the SkipScaledObjectCreation annotation to true on your HTTPScaledObject.  The reconciler will then skip the KEDA core ScaledObject creation which will allow you to create your own ScaledObject and add http scaler as one of your triggers.
+
+Step 1, add skipScaledObjectCreation annotation to your HTTPScaledObject.
+```console
+annotations:
+  skipScaledObjectCreation: true
+```
+
+Step 2, add an external-push trigger to your existing ScaledObject.  The hosts should match the list of hosts in your HTTPScaledObject.
 
 ```console
   triggers:
